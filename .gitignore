@@ -1,0 +1,27 @@
+# Environment variables
+.env
+*.env.local
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+
+# Build artifacts
+dist/
+build/
+out/
+
+# System specific
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

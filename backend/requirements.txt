@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+supabase
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic
+python-multipart
+python-dotenv
+transformers
+torch
+scipy
+sentence-transformers
+librosa
+soundfile
+ultralytics
+email-validator
