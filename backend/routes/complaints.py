@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 import shutil
 import os
+import uuid
 
 # Import database client
 from database import supabase
@@ -31,45 +32,56 @@ async def create_complaint(
     Submit a new complaint. AI classifies, prioritizes and routes it automatically.
     Supports optional image upload for visual triage.
     """
+    # SECURITY: Only citizens can submit reports.
+    if current_user.get("role") != "citizen":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only public users can submit reports."
+        )
+
     try:
+        # 0. Pre-Processing (Normalization & Noise Removal)
+        print(f"DEBUG: Processing complaint from user {current_user.get('sub')}")
+        text = text.strip().replace("\n", " ")
+        
         # 1. AI Analysis (NLP)
+        print("DEBUG: Starting NLP analysis...")
         cat_result = classify_complaint(text)
         urg_result = calculate_urgency(text)
         
         category = cat_result["category"]
         urgency = urg_result["urgency"]
         department = route_complaint(category, urgency)
+        print(f"DEBUG: NLP Result - Category: {category}, Urgency: {urgency}, Dept: {department}")
         
         # 1.1 Visual Analysis (If image provided)
         detections = []
         image_url = None
         if image:
-            # Save temp image for processing
-            temp_filename = f"temp_{uuid_name()}_{image.filename}"
-            temp_path = os.path.join("temp_audio", temp_filename) # reusing temp folder
+            print(f"DEBUG: Processing image: {image.filename}")
+            temp_filename = f"temp_{uuid.uuid4()}_{image.filename}"
+            temp_path = os.path.join("temp_audio", temp_filename)
             os.makedirs("temp_audio", exist_ok=True)
             
             with open(temp_path, "wb") as buffer:
                 shutil.copyfileobj(image.file, buffer)
             
             detections = analyze_image(temp_path)
-            # Boost urgency if critical infrastructure is detected
             boost = get_visual_urgency_boost(detections)
             if boost > 0 and urgency != 'critical':
-                urgency = 'high' # Simple boost logic
+                urgency = 'high'
             
-            # In real app, upload to Supabase Storage. For MVP, we'll use a placeholder.
             image_url = f"uploads/{image.filename}"
-            
-            # Note: detections logic is run, we could store 'detections' in a JSONB column 
-            # if the schema supported it. For now, it just impacts 'urgency'.
             
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+            print("DEBUG: Visual analysis complete.")
 
         # 1.2 Deduplication Check
+        print("DEBUG: Starting deduplication check...")
         embedding = get_embedding(text)
         duplicate_group_id = find_duplicate_group(text, category)
+        print(f"DEBUG: Deduplication result - GroupID: {duplicate_group_id}")
         
         # 2. Prepare Data for Database
         complaint_data = {
@@ -79,7 +91,7 @@ async def create_complaint(
             "category": category,
             "urgency": urgency,
             "department": department,
-            "status": "pending",
+            "status": "submitted",
             "user_id": current_user.get("sub"),
             "timestamp": datetime.now().isoformat(),
             "embedding": embedding,
@@ -87,14 +99,21 @@ async def create_complaint(
         }
         
         # 3. Insert into Database
+        print("DEBUG: Inserting into Supabase...")
+        # Use str() for safety if some values are complex types
         response = supabase.table("complaints").insert(complaint_data).execute()
         
         if not response.data:
+            print(f"DEBUG: Supabase insertion failed. Response: {response}")
             raise HTTPException(status_code=500, detail="Failed to create complaint record")
             
+        print("DEBUG: Complaint created successfully.")
         return response.data[0]
         
     except Exception as e:
+        import traceback
+        print(f"CRITICAL COMPLAINT ERROR: {str(e)}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error processing complaint: {str(e)}")
 
 def uuid_name():
@@ -116,9 +135,13 @@ async def get_complaints(
             
         user_role = current_user.get("role")
         user_id = current_user.get("sub")
+        user_dept = current_user.get("department")
         
         if user_role == "citizen":
             query = query.eq("user_id", user_id)
+        elif user_role == "officer" and user_dept:
+            # STRICT SEGREGATION: Officers only see their own department's issues
+            query = query.eq("department", user_dept)
             
         response = query.order("timestamp", desc=True).execute()
         return response.data

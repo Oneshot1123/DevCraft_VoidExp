@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     category TEXT,
     urgency TEXT CHECK (urgency IN ('low', 'medium', 'high', 'critical')),
     department TEXT,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'resolved', 'rejected')),
+    status TEXT DEFAULT 'submitted' CHECK (status IN ('submitted', 'assigned', 'in_progress', 'resolved', 'rejected')),
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     location TEXT,
     image_url TEXT,

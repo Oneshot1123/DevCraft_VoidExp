@@ -80,7 +80,7 @@ export default function ComplaintStatus() {
                                         variant={complaint.status === 'resolved' ? 'default' : 'secondary'}
                                         className={complaint.status === 'resolved' ? 'bg-green-600 hover:bg-green-700' : ''}
                                     >
-                                        {complaint.status}
+                                        {complaint.status.toUpperCase()}
                                     </Badge>
                                 </div>
                                 <CardTitle className="text-lg font-medium line-clamp-2 md:line-clamp-1">

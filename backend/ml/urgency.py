@@ -7,9 +7,9 @@ sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncas
 # Keywords that indicate high urgency or danger
 # Focused on life safety, immediate hazards, and severe infrastructure failure
 CRITICAL_KEYWORDS = [
-    "fire", "explosion", "spark", "electric shock", "wire exposed", 
+    "fire", "explosion", "spark", "electric shock", "wire exposed", "fallen", 
     "blood", "injury", "accident", "collapse", "drowning", "flood", 
-    "gas leak", "attack", "fight", "weapon", "emergency"
+    "gas leak", "attack", "fight", "weapon", "emergency", "school"
 ]
 
 HIGH_KEYWORDS = [

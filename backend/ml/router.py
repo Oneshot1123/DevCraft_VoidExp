@@ -1,13 +1,13 @@
 from typing import Dict
 
-# Define department names
-DEPT_SANITATION = "Sanitation & Waste"
-DEPT_ROADS = "Roads & Infrastructure"
-DEPT_WATER = "Water Supply"
-DEPT_ELECTRICITY = "Electricity"
-DEPT_SAFETY = "Public Safety"
-DEPT_TRAFFIC = "Traffic & Transport"
-DEPT_OTHER = "General Administration"
+# Define department names (Standardized lowercase identifiers)
+DEPT_SANITATION = "sanitation"
+DEPT_ROADS = "roads"
+DEPT_WATER = "water"
+DEPT_ELECTRICITY = "electricity"
+DEPT_SAFETY = "safety"
+DEPT_TRAFFIC = "traffic"
+DEPT_OTHER = "general"
 
 # Map classification categories to departments
 CATEGORY_TO_DEPT = {
@@ -28,19 +28,14 @@ def route_complaint(category: str, urgency: str) -> str:
     Future enhancement: Use urgency to potentially route to emergency services directly.
     """
     
-    # CRITICAL OVERRIDE: If urgency is critical, route to Public Safety immediately
-    # unless it's already Traffic or Fire related which might be specific, 
-    # but Public Safety is the safest general bucket for emergencies.
-    if urgency == "critical":
-        # Exception: If it's traffic related, maybe Traffic & Transport + Safety?
-        # For simplicity in MVP, we prioritize Public Safety for all critical threats.
+    # Mapping from category to department
+    department = CATEGORY_TO_DEPT.get(category, DEPT_OTHER)
+    
+    # EMERGENCY OVERRIDE: 
+    # If urgency is critical and category is 'other' or 'safety', route to safety.
+    # If it's a specific issue (electricity, water), keep it in that department
+    # but the dashboard will flag it as critical.
+    if urgency == "critical" and (category == "other" or category == "safety"):
         return DEPT_SAFETY
 
-    # Direct mapping from category to department
-    department = CATEGORY_TO_DEPT.get(category)
-    
-    if not department:
-        # Fallback if category is unknown
-        return DEPT_OTHER
-        
     return department

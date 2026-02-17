@@ -41,18 +41,43 @@ def find_duplicate_group(text: str, category: str, threshold: float = 0.85) -> O
             return None
             
         for record in response.data:
-            if not record.get("embedding"):
+            emb = record.get("embedding")
+            if not emb:
                 continue
                 
-            # Compare embeddings
-            score = util.cos_sim(torch.tensor(current_embedding), torch.tensor(record["embedding"]))
+            # SUPREME DEFENSE: Ensure emb is a list of floats
+            try:
+                if isinstance(emb, str):
+                    import json
+                    emb = json.loads(emb)
+                
+                # If it's a list, ensure elements are floats (not strings from a bad parse)
+                if isinstance(emb, list):
+                    emb = [float(x) for x in emb]
+                else:
+                    print(f"Skipping record {record['id']} - unknown embedding type: {type(emb)}")
+                    continue
+            except Exception as parse_err:
+                print(f"Failed to parse embedding for {record['id']}: {parse_err}")
+                continue
             
-            if score > threshold:
-                # Found a match! Return the existing group ID or the record ID if no group yet
-                return record.get("duplicate_group_id") or record["id"]
+            # Compare embeddings
+            try:
+                # Ensure both are tensors of same dtype
+                t1 = torch.tensor(current_embedding, dtype=torch.float32)
+                t2 = torch.tensor(emb, dtype=torch.float32)
+                score = util.cos_sim(t1, t2)
+                
+                if score > threshold:
+                    return record.get("duplicate_group_id") or record["id"]
+            except Exception as tensor_err:
+                print(f"Tensor comparison failed for {record['id']}: {tensor_err}")
+                continue
                 
         return None
         
     except Exception as e:
-        print(f"Deduplication error: {e}")
+        import traceback
+        print(f"Deduplication CRITICAL error: {e}")
+        traceback.print_exc()
         return None

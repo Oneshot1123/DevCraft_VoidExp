@@ -94,14 +94,19 @@ export default function ComplaintForm() {
                 body: formData
             });
 
-            if (!response.ok) throw new Error("Failed to submit complaint");
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed to submit complaint");
+            }
+
             setAiResult(data);
             setSuccess(true);
             setText("");
             setLocation("");
             setImageFile(null);
         } catch (err: any) {
+            console.error("Submission Error:", err);
             setError(err.message || "Something went wrong");
         } finally {
             setIsSubmitting(false);
@@ -225,7 +230,7 @@ export default function ComplaintForm() {
                             <div className="mt-6 flex gap-3 p-4 bg-blue-100/50 border-2 border-blue-200 rounded-xl">
                                 <ImageIcon className="h-5 w-5 text-blue-600 shrink-0" />
                                 <p className="text-xs text-blue-900 font-medium leading-relaxed">
-                                    <strong>Duplicate Detected:</strong> Our vision and language models found 3 similar reports nearby. We've consolidated your report with case #{aiResult.duplicate_group_id.substring(0, 8)} to prioritize field action.
+                                    <strong>Duplicate Detected:</strong> Our vision and language models found similar reports nearby. We've consolidated your report with case #{String(aiResult.duplicate_group_id).substring(0, 8)} to prioritize field action.
                                 </p>
                             </div>
                         )}

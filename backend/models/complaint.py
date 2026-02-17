@@ -20,7 +20,7 @@ class ComplaintCreate(ComplaintBase):
 
 # Schema for updating a complaint (status/department only usually)
 class ComplaintUpdate(BaseModel):
-    status: Optional[str] = Field(None, pattern="^(pending|in_progress|resolved|rejected)$")
+    status: Optional[str] = Field(None, pattern="^(submitted|assigned|in_progress|resolved|rejected)$")
     department: Optional[str] = None
     urgency: Optional[str] = None
 

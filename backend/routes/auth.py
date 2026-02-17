@@ -30,12 +30,17 @@ async def register(user: UserCreate):
     # Hash the password before storing
     hashed_pw = get_password_hash(user.password)
     
+    # SECURITY: Only 'citizen' and 'officer' roles can be registered via public signup.
+    # 'admin' role is explicitly blocked.
+    role = user.role if user.role in ["citizen", "officer"] else "citizen"
+    department = user.department if role == "officer" else None
+
     # Prepare user data
     user_data = {
         "email": user.email,
         "hashed_password": hashed_pw,
-        "role": user.role,
-        "department": user.department
+        "role": role,
+        "department": department
     }
 
     try:
@@ -79,9 +84,14 @@ async def login(user: UserLogin):
             )
             
         # Create JWT access token
-        # Payload includes user ID, email, and role
+        # Payload includes user ID, email, role, and department
         access_token = create_access_token(
-            data={"sub": db_user["id"], "email": db_user["email"], "role": db_user["role"]}
+            data={
+                "sub": db_user["id"], 
+                "email": db_user["email"], 
+                "role": db_user["role"],
+                "department": db_user.get("department")
+            }
         )
         
         # Return the token and role
