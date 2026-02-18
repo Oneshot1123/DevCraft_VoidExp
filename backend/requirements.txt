@@ -6,10 +6,11 @@ passlib[bcrypt]
 pydantic
 python-multipart
 python-dotenv
-transformers
+transformers>=4.48.0
+huggingface-hub>=0.28.0
 torch
 scipy
-sentence-transformers
+sentence-transformers>=3.3.0
 librosa
 soundfile
 ultralytics
