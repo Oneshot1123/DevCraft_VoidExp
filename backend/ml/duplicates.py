@@ -5,7 +5,9 @@ from database import supabase
 
 # Load a lightweight model (384-dimensional embeddings)
 # This model is fast and efficient for CPU usage
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# NOTE: "embeddings.position_ids UNEXPECTED" warning is a known harmless artifact 
+# of loading MiniLM-L6-v2 from certain transformers versions. It does not affect inference.
+model = SentenceTransformer('all-MiniLM-L6-v2') 
 
 def get_embedding(text: str) -> List[float]:
     """

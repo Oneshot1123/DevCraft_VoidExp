@@ -1,9 +1,13 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import ComplaintForm from './pages/ComplaintForm';
 import ComplaintStatus from './pages/ComplaintStatus';
 import AdminDashboard from './pages/AdminDashboard';
 import LandingPage from './pages/LandingPage';
+import { LocalizationProvider, useLocalization } from './context/LocalizationContext';
+import type { Language } from './utils/translations';
+import { motion } from 'framer-motion';
+import { Zap, LogOut, User } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +28,7 @@ function Login({ onLogin, onBack }: { onLogin: (token: string, role: string, dep
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
-      if (!res.ok) throw new Error("Incorrect email or password");
+      if (!res.ok) throw new Error("Incorrect keys/credentials");
       const data = await res.json();
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("role", data.role);
@@ -32,33 +36,47 @@ function Login({ onLogin, onBack }: { onLogin: (token: string, role: string, dep
       onLogin(data.access_token, data.role, data.department || "");
     } catch (e: unknown) {
       if (e instanceof Error) setErr(e.message);
-      else setErr("Login failed");
+      else setErr("Access Denied");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
-      <Button variant="ghost" className="absolute top-8 left-8" onClick={onBack}>← Back to Home</Button>
-      <Card className="w-full max-w-sm shadow-2xl border-none">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold tracking-tight text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">CivicSense</CardTitle>
-          <p className="text-center text-sm text-muted-foreground italic">Sign in to your portal</p>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" type="email" required />
+    <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30">
+      <div className="fixed inset-0 z-0 mesh-gradient opacity-60 pointer-events-none" />
+      <Button
+        variant="ghost"
+        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-zinc-500 hover:text-white"
+        onClick={onBack}
+      >
+        ← Return to Origin
+      </Button>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
+        <Card className="glass-card border-none rounded-[3rem] overflow-hidden shadow-2xl">
+          <CardHeader className="space-y-4 py-16 border-b border-white/5 bg-gradient-to-b from-blue-600/10 items-center">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-2 shadow-2xl shadow-blue-500/20 rotate-12">
+              <Zap className="w-8 h-8 text-white" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            {err && <p className="text-sm text-red-500 font-medium text-center">{err}</p>}
-            <Button type="submit" className="w-full h-11 text-base font-semibold">Sign In</Button>
-          </form>
-        </CardContent>
-      </Card>
+            <CardTitle className="text-4xl font-black tracking-tighter text-gradient uppercase italic">Initialize</CardTitle>
+            <p className="text-center text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Authorized Access Only</p>
+          </CardHeader>
+          <CardContent className="p-10 pt-12 space-y-8">
+            <form onSubmit={handleLogin} className="space-y-8">
+              <div className="space-y-3">
+                <Label htmlFor="login-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Registry Email</Label>
+                <Input id="login-email" data-testid="login-email" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={email} onChange={e => setEmail(e.target.value)} placeholder="officer@civic.gov" type="email" required />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="login-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Security Key</Label>
+                <Input id="login-password" data-testid="login-password" type="password" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={password} onChange={e => setPassword(e.target.value)} required />
+              </div>
+              {err && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center italic">{err}</p>}
+              <Button id="login-submit" data-testid="login-submit" type="submit" className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-white text-black hover:bg-zinc-200 shadow-xl shadow-white/5 transition-all">
+                Initialize Session
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
@@ -66,12 +84,8 @@ function Login({ onLogin, onBack }: { onLogin: (token: string, role: string, dep
 function Register({ onRegister, onBack }: { onRegister: () => void, onBack: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("citizen");
-  const [department, setDepartment] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const departments = ["sanitation", "roads", "water", "electricity", "safety", "traffic", "general"];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,81 +95,61 @@ function Register({ onRegister, onBack }: { onRegister: () => void, onBack: () =
       const res = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role, department: role === 'officer' ? department : null })
+        body: JSON.stringify({ email, password })
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "Registration failed");
+        throw new Error(data.detail || "Registry Update Failed");
       }
       onRegister();
     } catch (e: unknown) {
       if (e instanceof Error) setErr(e.message);
-      else setErr("Registration failed");
+      else setErr("Registration Inhibited");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden relative p-4">
-      <Button variant="ghost" className="absolute top-8 left-8" onClick={onBack}>← Back</Button>
-      <Card className="w-full max-w-md shadow-2xl border-none">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold tracking-tight text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Join CivicSense</CardTitle>
-          <p className="text-center text-sm text-muted-foreground italic">Create your municipal account</p>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" type="email" required />
+    <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30">
+      <div className="fixed inset-0 z-0 mesh-gradient opacity-60 pointer-events-none" />
+      <Button
+        variant="ghost"
+        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-zinc-500 hover:text-white"
+        onClick={onBack}
+      >
+        ← Return
+      </Button>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
+        <Card className="glass-card border-none rounded-[3rem] overflow-hidden shadow-2xl">
+          <CardHeader className="space-y-4 py-16 border-b border-white/5 bg-gradient-to-b from-blue-600/10 items-center">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-2 shadow-2xl shadow-blue-500/20 -rotate-6">
+              <Zap className="w-8 h-8 text-white" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            <div className="grid gap-2">
-              <Label>Account Type</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant={role === 'citizen' ? 'default' : 'outline'}
-                  onClick={() => setRole('citizen')}
-                  className="h-10"
-                >Citizen</Button>
-                <Button
-                  type="button"
-                  variant={role === 'officer' ? 'default' : 'outline'}
-                  onClick={() => setRole('officer')}
-                  className="h-10"
-                >Officer</Button>
+            <CardTitle className="text-4xl font-black tracking-tighter text-gradient uppercase italic">Registry</CardTitle>
+            <p className="text-center text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">New Citizen Enrollment</p>
+          </CardHeader>
+          <CardContent className="p-10 pt-12 space-y-8">
+            <form onSubmit={handleRegister} className="space-y-8">
+              <div className="space-y-3">
+                <Label htmlFor="reg-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Email Identity</Label>
+                <Input id="reg-email" data-testid="reg-email" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={email} onChange={e => setEmail(e.target.value)} placeholder="citizen@civic.net" type="email" required />
               </div>
-            </div>
-            {role === 'officer' && (
-              <div className="grid gap-2">
-                <Label htmlFor="dept">Department</Label>
-                <select
-                  id="dept"
-                  value={department}
-                  onChange={e => setDepartment(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  required
-                >
-                  <option value="">Select Department</option>
-                  {departments.map(d => <option key={d} value={d}>{d.toUpperCase()}</option>)}
-                </select>
+              <div className="space-y-3">
+                <Label htmlFor="reg-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Access Passcode</Label>
+                <Input id="reg-password" data-testid="reg-password" type="password" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={password} onChange={e => setPassword(e.target.value)} required />
               </div>
-            )}
-            {err && <p className="text-sm text-red-500 font-medium text-center">{err}</p>}
-            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
-              {loading ? "Creating account..." : "Register Account"}
-            </Button>
-            <p className="text-center text-xs text-muted-foreground pt-2">
-              Already have an account? <button type="button" onClick={onBack} className="text-blue-600 font-bold hover:underline">Sign In</button>
-            </p>
-          </form>
-        </CardContent>
-      </Card>
+              {err && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center italic">{err}</p>}
+              <Button id="reg-submit" data-testid="reg-submit" type="submit" disabled={loading} className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-white text-black hover:bg-zinc-200 shadow-xl shadow-white/5 transition-all">
+                {loading ? "INITIALIZING..." : "Enact Registry"}
+              </Button>
+              <button type="button" onClick={onBack} className="w-full text-[9px] font-black text-zinc-600 hover:text-white uppercase tracking-widest text-center">
+                Already Enlisted? Return to Origin
+              </button>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
@@ -163,65 +157,132 @@ function Register({ onRegister, onBack }: { onRegister: () => void, onBack: () =
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role") || "citizen");
-  const [department, setDepartment] = useState(localStorage.getItem("department") || "");
-  const [view, setView] = useState<"landing" | "login" | "signup">("landing");
+  const [, setDepartment] = useState(localStorage.getItem("department") || "");
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const { setLanguage, language } = useLocalization();
+  const navigate = useNavigate();
+
+  // Define route protection components
+  const CitizenRoute = ({ children }: { children: React.ReactNode }) => {
+    if (!token) return <Navigate to="/login" state={{ from: '/report' }} replace />;
+    if (role !== 'citizen') return <Navigate to="/admin" replace />;
+    return <>{children}</>;
+  };
+
+  const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+    if (!token) return <Navigate to="/login" replace />;
+    if (role !== 'city_admin' && role !== 'officer') return <Navigate to="/report" replace />;
+    return <>{children}</>;
+  };
+
+  const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+    if (token) return <Navigate to={role === 'citizen' ? "/report" : "/admin"} replace />;
+    return <>{children}</>;
+  };
 
   const handleLogin = (newToken: string, newRole: string, newDept: string) => {
     setToken(newToken);
     setRole(newRole);
     setDepartment(newDept);
+    if (redirectPath) {
+      navigate(redirectPath);
+      setRedirectPath(null);
+    } else {
+      navigate(newRole === 'citizen' ? '/report' : '/admin');
+    }
   };
 
-  if (!token) {
-    if (view === "landing") return <LandingPage
-      onGetStarted={() => setView("signup")}
-      onLogin={() => setView("login")}
-    />;
-    if (view === "signup") return <Register onRegister={() => setView("login")} onBack={() => setView("login")} />;
-    return <Login onLogin={handleLogin} onBack={() => setView("landing")} />;
-  }
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("department");
+    setToken(null);
+    setRedirectPath(null);
+    navigate('/');
+  };
 
   return (
-    <Router>
-      <div className="min-h-screen bg-background font-sans antialiased text-foreground">
-        <nav className="border-b sticky top-0 bg-background/80 backdrop-blur-xl z-50">
-          <div className="flex h-16 items-center px-6 container mx-auto">
-            <div className="font-extrabold text-2xl mr-12 bg-gradient-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent">CivicSense</div>
-            <div className="flex gap-8 text-sm font-semibold">
-              {role === 'citizen' && (
-                <>
-                  <Link to="/" className="transition-all hover:text-blue-600">New Report</Link>
-                  <Link to="/status" className="transition-all hover:text-blue-600">My Feed</Link>
-                </>
-              )}
-              {role !== 'citizen' && (
-                <Link to="/admin" className="transition-all hover:text-blue-600 border-b-2 border-blue-600 pb-1">Admin Dashboard</Link>
-              )}
-            </div>
-            <div className="ml-auto flex items-center gap-6">
-              <Badge variant="secondary" className="capitalize px-4 py-1 font-mono text-[10px] tracking-widest bg-blue-50 text-blue-700">
-                {role.replace('_', ' ')} {department && `(${department})`}
-              </Badge>
-              <Button variant="ghost" size="sm" onClick={() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("role");
-                setToken(null);
-                setView("landing");
-              }}>Logout</Button>
-            </div>
-          </div>
-        </nav>
+    <div className="min-h-screen bg-zinc-950 text-white selection:bg-blue-500/30 neural-noise overflow-hidden">
+      <div className="fixed inset-0 z-0 mesh-gradient opacity-30 pointer-events-none" />
 
-        <main className="min-h-[calc(100vh-4rem)]">
-          <Routes>
-            <Route path="/" element={<ComplaintForm />} />
-            <Route path="/status" element={<ComplaintStatus />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 h-24 glass border-none">
+        <div className="flex items-center gap-10">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 rotate-12">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-black tracking-tighter uppercase italic translate-y-[1px]">CivicSense</span>
+          </Link>
+          <div className="hidden md:flex gap-10">
+            {role === 'citizen' ? (
+              <>
+                <Link to="/report" className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-white transition-colors">Dispatch Report</Link>
+                <Link to="/status" className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-white transition-colors">Sector Pulse</Link>
+              </>
+            ) : (
+              <Link to="/admin" className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 underline decoration-2 underline-offset-8">Executive Oversight</Link>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-8">
+          <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/5 gap-1.5 backdrop-blur-md">
+            {(['en', 'hi', 'mr'] as Language[]).map(l => (
+              <button
+                key={l}
+                onClick={() => setLanguage(l)}
+                className={`px-3 py-1 text-[8px] font-black rounded-lg transition-all ${language === l ? 'bg-white text-black shadow-lg' : 'text-zinc-600 hover:text-zinc-300'}`}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 pl-4 border-l border-white/5">
+            <Badge variant="outline" className="h-10 px-4 rounded-xl font-black text-[9px] uppercase tracking-widest border-white/10 text-zinc-500 flex gap-2">
+              <User className="w-3 h-3 text-blue-500" /> {role.replace('_', ' ')}
+            </Badge>
+            <button onClick={handleLogout} className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center hover:bg-zinc-800 transition-all text-zinc-500 hover:text-white">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="relative z-10 min-h-screen pt-24">
+        <Routes>
+          <Route path="/" element={<LandingPage
+            onGetStarted={() => navigate(token ? (role === 'citizen' ? '/report' : '/admin') : '/signup')}
+            onLogin={() => navigate('/login')}
+            onTrack={() => {
+              if (token) {
+                navigate('/status');
+              } else {
+                setRedirectPath("/status");
+                navigate('/login');
+              }
+            }}
+            isAuthenticated={!!token}
+            userRole={role}
+          />} />
+          <Route path="/login" element={<AuthRoute><Login onLogin={handleLogin} onBack={() => navigate('/')} /></AuthRoute>} />
+          <Route path="/signup" element={<AuthRoute><Register onRegister={() => navigate('/login')} onBack={() => navigate('/')} /></AuthRoute>} />
+          <Route path="/report" element={<CitizenRoute><ComplaintForm /></CitizenRoute>} />
+          <Route path="/status" element={<CitizenRoute><ComplaintStatus /></CitizenRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 
-export default App;
+export default function Root() {
+  return (
+    <Router>
+      <LocalizationProvider>
+        <App />
+      </LocalizationProvider>
+    </Router>
+  );
+}

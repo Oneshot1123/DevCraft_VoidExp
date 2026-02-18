@@ -8,21 +8,30 @@ from models.user import UserCreate, UserLogin, UserRead, Token
 # Import auth handler utils
 from auth.jwt_handler import create_access_token
 # Import password hashing utils
-from passlib.context import CryptContext
+import bcrypt
+import hashlib
 
 # Create a router for auth endpoints
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-# Initialize password hashing context (bcrypt)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def _get_hashable_password(password: str) -> str:
+    """Pre-hash password with SHA-256 to bypass bcrypt's 72-byte limit."""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 # Helper function to hash passwords
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def get_password_hash(password: str):
+    # Pre-hash to bypass 72-byte limit and convert to bytes
+    password_bytes = _get_hashable_password(password).encode('utf-8')
+    # Generate salt and hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode('utf-8')
 
 # Helper function to verify passwords
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, hashed_password: str):
+    password_bytes = _get_hashable_password(plain_password).encode('utf-8')
+    hashed_password_bytes = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password_bytes, hashed_password_bytes)
 
 # Endpoint for user registration
 @router.post("/register", response_model=UserRead)
@@ -30,10 +39,10 @@ async def register(user: UserCreate):
     # Hash the password before storing
     hashed_pw = get_password_hash(user.password)
     
-    # SECURITY: Only 'citizen' and 'officer' roles can be registered via public signup.
-    # 'admin' role is explicitly blocked.
-    role = user.role if user.role in ["citizen", "officer"] else "citizen"
-    department = user.department if role == "officer" else None
+    # SECURITY: Only 'citizen' role can be registered via public signup.
+    # Officer and Admin roles are seeded by the system only.
+    role = "citizen"
+    department = None
 
     # Prepare user data
     user_data = {
@@ -94,11 +103,12 @@ async def login(user: UserLogin):
             }
         )
         
-        # Return the token and role
+        # Return the token, role, and department
         return {
             "access_token": access_token, 
             "token_type": "bearer",
-            "role": db_user["role"]
+            "role": db_user["role"],
+            "department": db_user.get("department")
         }
         
     except Exception as e:

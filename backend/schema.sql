@@ -23,8 +23,14 @@ CREATE TABLE IF NOT EXISTS complaints (
     location TEXT,
     image_url TEXT,
     audio_url TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    ward TEXT,
+    area TEXT,
     embedding VECTOR(384), -- For semantic similarity (assuming 384 dim model)
     duplicate_group_id UUID,
+    sla_eta TEXT,           -- Duration like '2 Hours'
+    duplicate_count INTEGER DEFAULT 0,
     user_id UUID REFERENCES users(id)
 );
 

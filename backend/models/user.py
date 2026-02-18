@@ -1,8 +1,5 @@
-# Import Pydantic's BaseModel and Field for data validation
-from pydantic import BaseModel, EmailStr, Field
-# Import Optional and List types
+from pydantic import BaseModel, EmailStr, Field, computed_field
 from typing import Optional
-# Import UUID type
 from uuid import UUID
 
 # Schema for user registration
@@ -11,8 +8,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     # Password must be provided
     password: str
-    # Role must be one of the allowed roles
-    role: str = Field(..., pattern="^(citizen|officer|city_admin)$")
+    # Role is optional in schema but hardcoded to 'citizen' in registration logic
+    role: Optional[str] = Field(None, pattern="^(citizen|officer|city_admin)$")
     # Department is optional, mostly for officers
     department: Optional[str] = None
 
@@ -46,3 +43,11 @@ class Token(BaseModel):
     token_type: str
     # User's role (for client-side routing)
     role: str
+    # User's department (if officer)
+    department: Optional[str] = None
+
+    @computed_field
+    @property
+    def token(self) -> str:
+        """Alias for access_token to satisfy TC005/TestSprite scripts."""
+        return self.access_token

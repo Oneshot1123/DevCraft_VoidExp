@@ -1,0 +1,121 @@
+export const translations = {
+    en: {
+        appName: "CivicSense",
+        signIn: "Sign In",
+        signUp: "Sign Up",
+        getStarted: "Begin Onboarding",
+        reportIssue: "Report Issue",
+        myFeed: "My Feed",
+        adminDashboard: "Admin Dashboard",
+        logout: "Logout",
+        heroTitle: "SMART GOVERNANCE.",
+        heroSubtitle: "The world's first autonomous triage engine for city infrastructure.",
+        heroBadge: "Intelligent Municipal Logistics",
+        sectorsTitle: "Seven Sectors. One System.",
+        sectorsSubtitle: "Unified management across every critical municipal department.",
+        departments: {
+            sanitation: "Sanitation",
+            roads: "Roads & Infra",
+            water: "Water Supply",
+            electricity: "Electricity",
+            safety: "Public Safety",
+            traffic: "Traffic",
+            general: "General/Other"
+        },
+        form: {
+            title: "Public Report",
+            description: "Empowering citizens with AI-driven municipal response.",
+            issueLabel: "Issue Description",
+            issuePlaceholder: "Describe the issue clearly. Our AI will handle the rest.",
+            locating: "PINPOINT LOCATION",
+            useGps: "Use My GPS",
+            dragMarker: "Drag the marker to the exact location of the issue.",
+            locationDetails: "Location Details",
+            locationPlaceholder: "e.g., Corner of 5th & Oak",
+            evidencePhoto: "Evidence Photo",
+            addPhoto: "Add Photo",
+            submit: "Submit to City Hall",
+            submitting: "Running Triage..."
+        }
+    },
+    hi: {
+        appName: "सिविकसेंस (CivicSense)",
+        signIn: "साइन इन करें",
+        signUp: "साइन अप करें",
+        getStarted: "शुरू करें",
+        reportIssue: "शिकायत दर्ज करें",
+        myFeed: "मेरी शिकायतें",
+        adminDashboard: "एडमिन डैशबोर्ड",
+        logout: "लॉगआउट",
+        heroTitle: "स्मार्ट शासन (Smart Governance)",
+        heroSubtitle: "शहर के बुनियादी ढांचे के लिए दुनिया का पहला स्वायत्त ट्राइएज इंजन।",
+        heroBadge: "बुद्धिमान नगरपालिका रसद",
+        sectorsTitle: "सात विभाग। एक व्यवस्था।",
+        sectorsSubtitle: "हर महत्वपूर्ण नगर पालिका विभाग में एकीकृत प्रबंधन।",
+        departments: {
+            sanitation: "स्वच्छता",
+            roads: "सड़कें और बुनियादी ढांचा",
+            water: "जलापूर्ति",
+            electricity: "बिजली",
+            safety: "सार्वजनिक सुरक्षा",
+            traffic: "यातायात",
+            general: "सामान्य/अन्य"
+        },
+        form: {
+            title: "सार्वजनिक रिपोर्ट",
+            description: "AI-संचालित नगरपालिका प्रतिक्रिया के साथ नागरिकों को सशक्त बनाना।",
+            issueLabel: "समस्या का विवरण",
+            issuePlaceholder: "समस्या का स्पष्ट वर्णन करें। हमारा AI बाकी काम संभाल लेगा।",
+            locating: "सटीक स्थान चुनें",
+            useGps: "मेरे GPS का उपयोग करें",
+            dragMarker: "मार्कर को समस्या के सटीक स्थान पर खींचें।",
+            locationDetails: "स्थान विवरण",
+            locationPlaceholder: "जैसे, 5वीं और ओक का कोना",
+            evidencePhoto: "सबूत फोटो",
+            addPhoto: "फोटो जोड़ें",
+            submit: "नगर पालिका को भेजें",
+            submitting: "जांच जारी है..."
+        }
+    },
+    mr: {
+        appName: "सिविकसेन्स (CivicSense)",
+        signIn: "साइन इन करा",
+        signUp: "साइन अप करा",
+        getStarted: "सुरू करा",
+        reportIssue: "तक्रार नोंदवा",
+        myFeed: "माझ्या तक्रारी",
+        adminDashboard: "अ‍ॅडमिन डॅशबोर्ड",
+        logout: "लॉगआउट",
+        heroTitle: "स्मार्ट प्रशासन.",
+        heroSubtitle: "शहराच्या पायाभूत सुविधांसाठी जगातील पहिले स्वायत्त ट्राइएज इंजिन.",
+        heroBadge: "बुद्धिमान नगरपालिका रसद",
+        sectorsTitle: "सात विभाग. एक प्रणाली.",
+        sectorsSubtitle: "प्रत्येक महत्त्वपूर्ण नगरपालिका विभागामध्ये एकात्मिक व्यवस्थापन.",
+        departments: {
+            sanitation: "स्वच्छता",
+            roads: "रस्ते आणि पायाभूत सुविधा",
+            water: "पाणीपुरवठा",
+            electricity: "वीज",
+            safety: "सार्वजनिक सुरक्षा",
+            traffic: "वाहतूक",
+            general: "सामान्य/इतर"
+        },
+        form: {
+            title: "सार्वजनिक अहवाल",
+            description: "AI-चालित नगरपालिका प्रतिसादासह नागरिकांना सक्षम करणे.",
+            issueLabel: "समस्येचे वर्णन",
+            issuePlaceholder: "समस्येचे स्पष्ट वर्णन करा. आमचे AI बाकीचे हाताळेल.",
+            locating: "अचूक स्थान निवडा",
+            useGps: "माझा GPS वापरा",
+            dragMarker: "मार्कर समस्येच्या अचूक ठिकाणावर ड्रॅग करा.",
+            locationDetails: "स्थान तपशील",
+            locationPlaceholder: "उदा., ५ वा आणि ओक कोपरा",
+            evidencePhoto: "पुराव्याचा फोटो",
+            addPhoto: "फोटो जोडा",
+            submit: "नगरपालिकेकडे सादर करा",
+            submitting: "तपासणी सुरू आहे..."
+        }
+    }
+};
+
+export type Language = keyof typeof translations;

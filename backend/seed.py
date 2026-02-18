@@ -1,17 +1,24 @@
 import sys
 import os
-import asyncio
+import bcrypt
+import hashlib
 
 # Add parent directory to path to allow absolute imports of 'backend'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from database import supabase
-from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def _get_hashable_password(password: str) -> str:
+    """Pre-hash password with SHA-256 to bypass bcrypt's 72-byte limit."""
+    return hashlib.sha256(password.encode()).hexdigest()
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def get_password_hash(password: str):
+    # Pre-hash to bypass 72-byte limit and convert to bytes
+    password_bytes = _get_hashable_password(password).encode('utf-8')
+    # Generate salt and hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode('utf-8')
 
 def seed_users():
     print("Seeding users...")
@@ -35,6 +42,7 @@ def seed_users():
         { "email": "safety@city.gov", "password": "password123", "role": "officer", "department": "safety" },
         { "email": "traffic@city.gov", "password": "password123", "role": "officer", "department": "traffic" },
         { "email": "general@city.gov", "password": "password123", "role": "officer", "department": "general" },
+        { "email": "virajdchheda@gmail.com", "password": "123456", "role": "city_admin" },
     ]
     
     for user_info in users:
@@ -53,7 +61,7 @@ def seed_users():
             }
 
             if res.data:
-                print(f"User {user_info['email']} already exists. Updating record...")
+                print(f"User {user_info['email']} already exists. Updating record with new hashing...")
                 supabase.table("users").update(user_data).eq("email", user_info['email']).execute()
                 continue
                 
@@ -61,7 +69,7 @@ def seed_users():
             supabase.table("users").insert(user_data).execute()
             print(f"User {user_info['email']} created.")
         except Exception as e:
-            print(f"Error creating user {user_info['email']}: {e}")
+            print(f"Error seeding user {user_info['email']}: {e}")
 
 if __name__ == "__main__":
     seed_users()

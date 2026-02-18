@@ -1,242 +1,328 @@
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Send, Mic, Square, MapPin, Image as ImageIcon, CheckCircle, Paperclip } from "lucide-react";
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Camera,
+    CheckCircle2,
+    ArrowRight,
+    ArrowLeft,
+    Zap,
+    Globe,
+    Shield,
+    Loader2,
+    Mic,
+    Search
+} from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix Leaflet icon issue
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function ComplaintForm() {
+    const navigate = useNavigate();
+    const [step, setStep] = useState(1);
     const [text, setText] = useState("");
-    const [location, setLocation] = useState("");
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null);
+    const [image, setImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState<any>(null);
+    const [address, setAddress] = useState("");
     const [isRecording, setIsRecording] = useState(false);
-    const [isTranscribing, setIsTranscribing] = useState(false);
-    const [aiResult, setAiResult] = useState<any>(null);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
 
-    const mediaRecorder = useRef<MediaRecorder | null>(null);
-    const audioChunks = useRef<Blob[]>([]);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (step === 2 && !location) {
+            // Auto-GPS capture
+            navigator.geolocation.getCurrentPosition(
+                (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                (err) => console.error("GPS inhibited:", err)
+            );
+        }
+    }, [step, location]);
 
-    const startRecording = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder.current = new MediaRecorder(stream);
-            audioChunks.current = [];
-            mediaRecorder.current.ondataavailable = (event) => audioChunks.current.push(event.data);
-            mediaRecorder.current.onstop = async () => {
-                const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
-                await transcribeAudio(audioBlob);
-            };
-            mediaRecorder.current.start();
-            setIsRecording(true);
-            setError("");
-        } catch (err) {
-            setError("Microphone access denied.");
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result as string);
+            reader.readAsDataURL(file);
         }
     };
 
-    const stopRecording = () => {
-        if (mediaRecorder.current) {
-            mediaRecorder.current.stop();
-            setIsRecording(false);
-            mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
-        }
+    const LocationMarker = () => {
+        const markerRef = useRef<L.Marker>(null);
+        useMapEvents({
+            click(e) {
+                setLocation(e.latlng);
+            },
+        });
+
+        const eventHandlers = {
+            dragend() {
+                const marker = markerRef.current;
+                if (marker != null) {
+                    setLocation(marker.getLatLng());
+                }
+            },
+        };
+
+        return location ? (
+            <Marker
+                draggable={true}
+                eventHandlers={eventHandlers}
+                position={location}
+                ref={markerRef}
+            />
+        ) : null;
     };
 
-    const transcribeAudio = async (blob: Blob) => {
-        setIsTranscribing(true);
-        const formData = new FormData();
-        formData.append("file", blob, "recording.wav");
-        try {
-            const response = await fetch("http://localhost:8000/voice/transcribe", {
-                method: "POST",
-                body: formData
-            });
-            if (!response.ok) throw new Error("Transcription failed");
-            const data = await response.json();
-            setText(prev => (prev ? prev + " " + data.text : data.text));
-        } catch (err) {
-            setError("Voice transcription failed.");
-        } finally {
-            setIsTranscribing(false);
-        }
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setImageFile(e.target.files[0]);
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setError("");
-        setSuccess(false);
-
+    const handleSubmit = async () => {
+        setLoading(true);
         const formData = new FormData();
         formData.append("text", text);
-        if (location) formData.append("location", location);
-        if (imageFile) formData.append("image", imageFile);
+        if (location) {
+            formData.append("latitude", location.lat.toString());
+            formData.append("longitude", location.lng.toString());
+        }
+        if (image) formData.append("image", image);
 
         try {
-            const response = await fetch("http://localhost:8000/complaints/", {
+            const res = await fetch("http://localhost:8000/complaints/", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 body: formData
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || "Failed to submit complaint");
-            }
-
-            setAiResult(data);
-            setSuccess(true);
-            setText("");
-            setLocation("");
-            setImageFile(null);
-        } catch (err: any) {
-            console.error("Submission Error:", err);
-            setError(err.message || "Something went wrong");
+            const data = await res.json();
+            setResult(data);
+            setStep(4);
+        } catch (err) {
+            console.error(err);
         } finally {
-            setIsSubmitting(false);
+            setLoading(false);
         }
     };
 
     return (
-        <div className="container max-w-2xl py-10 px-4 mx-auto">
-            <Card className="shadow-2xl border-none ring-1 ring-gray-200 bg-white">
-                <CardHeader className="text-center pb-8 border-b mb-6 space-y-2">
-                    <CardTitle className="text-4xl font-extrabold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Public Report</CardTitle>
-                    <CardDescription className="text-sm font-medium">Empowering citizens with AI-driven municipal response.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        <div className="space-y-3">
-                            <Label htmlFor="text" className="text-xs font-black uppercase tracking-widest text-blue-600">Issue Description</Label>
-                            <div className="relative group">
-                                <Textarea
-                                    id="text"
-                                    placeholder="Describe the issue clearly. Our AI will handle the rest."
-                                    className="min-h-[160px] resize-none pr-12 text-base border-2 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all rounded-xl"
+        <div className="min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30 py-20 px-6">
+            <div className="fixed inset-0 z-0 mesh-gradient opacity-40 pointer-events-none" />
+
+            <div className="relative z-10 max-w-5xl mx-auto">
+                <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                            <div className="h-12 w-3 bg-blue-600 rounded-full shadow-lg shadow-blue-500/20" />
+                            <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-gradient uppercase">
+                                Dispatch Report
+                            </h1>
+                        </div>
+                        <p className="text-xl text-zinc-500 dark:text-zinc-400 pl-7 max-w-xl font-medium leading-relaxed">
+                            Neural-optimized reporting flow. Step {step} of 3.
+                        </p>
+                    </div>
+                    {step < 4 && (
+                        <div className="flex gap-2">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= i ? 'bg-blue-600' : 'bg-zinc-800'}`} />
+                            ))}
+                        </div>
+                    )}
+                </header>
+
+                <AnimatePresence mode="wait">
+                    {step === 1 && (
+                        <motion.div
+                            key="step1"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="glass-card rounded-[3rem] p-12 space-y-8"
+                        >
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Subject Metadata</label>
+                                <textarea
+                                    id="complaint-text"
+                                    data-testid="complaint-text"
                                     value={text}
                                     onChange={(e) => setText(e.target.value)}
-                                    required
-                                />
-                                <div className="absolute right-4 bottom-4 flex gap-3">
-                                    {!isRecording ? (
-                                        <Button
-                                            type="button" variant="secondary" size="icon"
-                                            onClick={startRecording} disabled={isTranscribing}
-                                            className="h-10 w-10 rounded-full shadow-sm hover:bg-blue-50 hover:text-blue-600 transition-all"
-                                        >
-                                            <Mic className="h-5 w-5" />
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            type="button" variant="destructive" size="icon"
-                                            onClick={stopRecording}
-                                            className="h-10 w-10 rounded-full animate-pulse shadow-md"
-                                        >
-                                            <Square className="h-4 w-4" />
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                            {isTranscribing && (
-                                <div className="flex items-center gap-2 text-xs text-blue-600 font-bold animate-pulse px-2">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    AI Transcribing...
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                                <Label htmlFor="location" className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-orange-500" /> Location Details
-                                </Label>
-                                <Input
-                                    id="location" placeholder="e.g., Corner of 5th & Oak"
-                                    value={location} onChange={(e) => setLocation(e.target.value)}
-                                    className="h-12 border-2 rounded-xl focus-visible:ring-blue-600"
+                                    placeholder="Describe the institutional issue in detail..."
+                                    className="w-full h-64 bg-zinc-900/50 border-none rounded-3xl p-8 text-2xl font-black tracking-tight focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-zinc-700"
                                 />
                             </div>
-                            <div className="space-y-3">
-                                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                    <ImageIcon className="h-4 w-4 text-purple-500" /> Evidence Photo
-                                </Label>
-                                <input
-                                    type="file" accept="image/*" className="hidden"
-                                    ref={fileInputRef} onChange={handleFileChange}
-                                />
-                                <Button
-                                    variant="outline" type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className={`w-full h-12 border-2 border-dashed rounded-xl transition-all ${imageFile ? 'border-green-500 bg-green-50/50 text-green-700' : 'hover:border-blue-400 hover:bg-blue-50/50'}`}
+                            <div className="flex justify-end">
+                                <button
+                                    id="step1-next"
+                                    data-testid="step1-next"
+                                    disabled={!text}
+                                    onClick={() => setStep(2)}
+                                    className="px-10 py-5 rounded-2xl bg-white text-black text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-white/5"
                                 >
-                                    {imageFile ? <div className="flex items-center gap-2 font-bold"><Paperclip className="h-4 w-4" /> {imageFile.name.substring(0, 15)}...</div> : <div className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Add Photo</div>}
-                                </Button>
+                                    Next Phase <ArrowRight className="w-4 h-4" />
+                                </button>
                             </div>
-                        </div>
+                        </motion.div>
+                    )}
 
-                        {error && (
-                            <Alert variant="destructive" className="border-2 bg-red-50 text-red-900 rounded-xl">
-                                <AlertTitle className="font-bold">Submission Error</AlertTitle>
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        )}
+                    {step === 2 && (
+                        <motion.div
+                            key="step2"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="glass-card rounded-[3rem] p-12 space-y-8 h-[700px] flex flex-col"
+                        >
+                            <div className="flex-1 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-inner bg-zinc-900 relative">
+                                <MapContainer center={[19.076, 72.8777]} zoom={12} className="h-full w-full grayscale contrast-125 invert opacity-80">
+                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <LocationMarker />
+                                </MapContainer>
+                                <div className="absolute top-8 left-8 z-[1000] glass-card px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                    <Globe className="w-3 h-3 text-blue-500" /> Neural Mapping Active
+                                </div>
+                                <div className="absolute bottom-8 left-8 right-8 z-[1000] space-y-4">
+                                    <div className="glass shadow-2xl p-6 rounded-3xl flex items-center gap-6">
+                                        <div className="p-4 rounded-2xl bg-blue-600/10 text-blue-500">
+                                            <Search className="w-6 h-6" />
+                                        </div>
+                                        <input
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            placeholder="Fallback: Enter Manual Identity/Address..."
+                                            className="bg-transparent border-none focus:ring-0 text-sm font-bold tracking-tight text-white flex-1"
+                                        />
+                                    </div>
+                                    <p className="text-center text-[8px] font-black text-zinc-600 uppercase tracking-widest">Dragging Enabled for Precision Calibration</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <button onClick={() => setStep(1)} className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors flex items-center gap-2">
+                                    <ArrowLeft className="w-4 h-4" /> Back
+                                </button>
+                                <button
+                                    disabled={!location}
+                                    onClick={() => setStep(3)}
+                                    className="px-10 py-5 rounded-2xl bg-white text-black text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-white/5"
+                                >
+                                    Geocode Location <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
 
-                        <Button type="submit" className="w-full h-14 text-xl font-black shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 rounded-xl bg-blue-700 hover:bg-blue-800" disabled={isSubmitting}>
-                            {isSubmitting ? <div className="flex items-center gap-3"><Loader2 className="h-6 w-6 animate-spin" /> Running Triage...</div> : <div className="flex items-center gap-3"><Send className="h-5 w-5" /> Submit to City Hall</div>}
-                        </Button>
-                    </form>
-                </CardContent>
+                    {step === 3 && (
+                        <motion.div
+                            key="step3"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="glass-card rounded-[3rem] p-12 space-y-12"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                <div className="space-y-6">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Visual Evidence (Optional)</label>
+                                    <div
+                                        onClick={() => document.getElementById('image-upload')?.click()}
+                                        className="h-80 w-full rounded-[2.5rem] bg-zinc-900/50 border-2 border-dashed border-zinc-800 hover:border-blue-600/50 transition-all flex flex-col items-center justify-center gap-4 cursor-pointer relative overflow-hidden group"
+                                    >
+                                        {imagePreview ? (
+                                            <img src={imagePreview} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" />
+                                        ) : (
+                                            <>
+                                                <Camera className="w-12 h-12 text-zinc-700 group-hover:text-blue-500 transition-colors" />
+                                                <span className="text-xs font-black uppercase tracking-widest text-zinc-600">Deploy Image Probe</span>
+                                            </>
+                                        )}
+                                        <input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                    </div>
 
-                {success && aiResult && (
-                    <div className="m-6 p-8 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 shadow-inner">
-                        <div className="flex items-center gap-3 mb-6 text-green-800 font-extrabold uppercase text-sm tracking-widest">
-                            <CheckCircle className="h-6 w-6 text-green-600" /> AI Intelligent Triage Report
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200">
-                                <span className="block text-[10px] text-muted-foreground font-black uppercase mb-1">AI Classification</span>
-                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-none font-bold px-3 py-1 text-xs">{aiResult.category}</Badge>
+                                    {/* Voice Input Probe */}
+                                    <button
+                                        onClick={() => setIsRecording(!isRecording)}
+                                        className={`w-full py-6 rounded-2xl flex items-center justify-center gap-4 border border-white/5 transition-all ${isRecording ? 'bg-red-500/20 text-red-500 animate-pulse border-red-500/30' : 'bg-zinc-900/50 text-zinc-600 hover:text-white hover:bg-zinc-800'}`}
+                                    >
+                                        <Mic className="w-5 h-5" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                                            {isRecording ? "Listening to Audio Payload..." : "Initialize Voice Probe"}
+                                        </span>
+                                    </button>
+                                </div>
+                                <div className="space-y-8 flex flex-col justify-center">
+                                    <div className="glass shadow-none p-8 rounded-3xl space-y-4">
+                                        <h4 className="flex items-center gap-2 text-blue-400 text-xs font-black uppercase tracking-widest">
+                                            <Shield className="w-4 h-4" /> Verification Protocol
+                                        </h4>
+                                        <p className="text-sm text-zinc-500 font-medium">By initializing this report, you confirm the municipal accuracy of the provided metadata.</p>
+                                    </div>
+                                    <button
+                                        id="complaint-submit"
+                                        data-testid="complaint-submit"
+                                        onClick={handleSubmit}
+                                        disabled={loading}
+                                        className="w-full h-24 rounded-3xl bg-blue-600 text-white text-lg font-black uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 group"
+                                    >
+                                        {loading ? <Loader2 className="w-8 h-8 animate-spin" /> : (
+                                            <>Commit Report <Zap className="w-6 h-6 group-hover:scale-125 transition-transform" /></>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200">
-                                <span className="block text-[10px] text-muted-foreground font-black uppercase mb-1">Priority Score</span>
-                                <Badge variant={aiResult.urgency === 'critical' ? 'destructive' : 'default'} className="uppercase font-black text-xs px-3 py-1">
-                                    {aiResult.urgency}
-                                </Badge>
+                        </motion.div>
+                    )}
+
+                    {step === 4 && result && (
+                        <motion.div
+                            key="step4"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="glass-card rounded-[3rem] p-16 text-center space-y-12"
+                        >
+                            <div className="w-24 h-24 rounded-full bg-emerald-500/20 text-emerald-500 mx-auto flex items-center justify-center animate-bounce shadow-2xl shadow-emerald-500/10">
+                                <CheckCircle2 className="w-12 h-12" />
                             </div>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200">
-                                <span className="block text-[10px] text-muted-foreground font-black uppercase mb-1">Smart Routing</span>
-                                <span className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                                    <div className="h-2 w-2 rounded-full bg-blue-600" /> {aiResult.department}
-                                </span>
+                            <div className="space-y-4">
+                                <h2 className="text-6xl font-black uppercase tracking-tighter text-gradient">Report Anchored</h2>
+                                <p className="text-xl text-zinc-400 font-medium">Your civic contribution has been TRIAGED and ROUTED.</p>
                             </div>
-                        </div>
-                        {aiResult.duplicate_group_id && (
-                            <div className="mt-6 flex gap-3 p-4 bg-blue-100/50 border-2 border-blue-200 rounded-xl">
-                                <ImageIcon className="h-5 w-5 text-blue-600 shrink-0" />
-                                <p className="text-xs text-blue-900 font-medium leading-relaxed">
-                                    <strong>Duplicate Detected:</strong> Our vision and language models found similar reports nearby. We've consolidated your report with case #{String(aiResult.duplicate_group_id).substring(0, 8)} to prioritize field action.
-                                </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                <div className="glass-card p-8 rounded-3xl space-y-2 border-white/5 bg-white/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Tracking ID</span>
+                                    <p className="text-xl font-black uppercase text-blue-500">{result.id.slice(0, 8)}</p>
+                                </div>
+                                <div className="glass-card p-8 rounded-3xl space-y-2 border-white/5 bg-white/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Sector</span>
+                                    <p className="text-xl font-black uppercase">{result.ward || "Ward A"}</p>
+                                </div>
+                                <div className="glass-card p-8 rounded-3xl space-y-2 border-blue-500/20 bg-blue-500/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">Neural Triage</span>
+                                    <p className="text-xl font-black uppercase text-blue-400">{result.category || result.classification}</p>
+                                </div>
+                                <div className="glass-card p-8 rounded-3xl space-y-2 border-emerald-500/20 bg-emerald-500/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Response SLA</span>
+                                    <p className="text-xl font-black uppercase text-emerald-400">{result.sla_eta || "24 Hours"}</p>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                )}
-            </Card>
+
+                            <button onClick={() => navigate('/status')} className="px-12 py-6 rounded-2xl bg-zinc-900 text-white text-sm font-black uppercase tracking-widest hover:scale-105 transition-all">
+                                Track Live Pulse
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }
