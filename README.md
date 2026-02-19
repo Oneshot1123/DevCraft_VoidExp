@@ -90,7 +90,6 @@ Citizens submit complaints via text, voice, or image. Our AI Neural Suite instan
 ### 1. Backend
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 # Set .env with SUPABASE_URL, SUPABASE_KEY, JWT_SECRET
 uvicorn main:app --reload
