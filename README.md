@@ -9,7 +9,7 @@ An intelligent civic platform that uses **NLP, Computer Vision, and Geospatial A
 > [!IMPORTANT]
 > The backend is hosted on **Hugging Face Spaces** (16GB RAM) to handle large AI models, while the frontend is on **Vercel**.
 
-*   **🌍 Live Portal:** [Visit CivicSense](https://dev-craft-void.vercel.app/) *(Placeholder: Please replace with your Vercel URL)*
+*   **🌍 Live Portal:** [Visit CivicSense](https://frontend-dc-eta.vercel.app/) *(Placeholder: Please replace with your Vercel URL)*
 *   **⚙️ Backend API:** `https://frank10101-civicsense.hf.space`
 *   **🚦 API Health:** [Check Status](https://frank10101-civicsense.hf.space/health)
 
@@ -101,7 +101,6 @@ Citizens submit complaints via text, voice, or image. Our AI Neural Suite instan
 ### 1. Backend
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 # Set .env with SUPABASE_URL, SUPABASE_KEY, JWT_SECRET
 uvicorn main:app --reload
