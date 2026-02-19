@@ -28,6 +28,15 @@ app.include_router(auth.router)
 app.include_router(complaints.router)
 app.include_router(voice.router)
 
+@app.get("/")
+async def root():
+    return {
+        "title": "CivicSense Backend API",
+        "status": "online",
+        "documentation": "/docs",
+        "health_check": "/health"
+    }
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "message": "CivicSense API is running"}

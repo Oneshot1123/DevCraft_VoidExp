@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from './config';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import ComplaintForm from './pages/ComplaintForm';
 import ComplaintStatus from './pages/ComplaintStatus';
@@ -23,7 +24,7 @@ function Login({ onLogin, onBack }: { onLogin: (token: string, role: string, dep
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -92,7 +93,7 @@ function Register({ onRegister, onBack }: { onRegister: () => void, onBack: () =
     setLoading(true);
     setErr("");
     try {
-      const res = await fetch("http://localhost:8000/auth/register", {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })

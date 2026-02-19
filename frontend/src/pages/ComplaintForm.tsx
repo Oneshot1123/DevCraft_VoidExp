@@ -16,6 +16,7 @@ import {
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { API_BASE_URL } from '../config';
 
 // Fix Leaflet icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -99,7 +100,7 @@ export default function ComplaintForm() {
         if (image) formData.append("image", image);
 
         try {
-            const res = await fetch("http://localhost:8000/complaints/", {
+            const res = await fetch(`${API_BASE_URL}/complaints/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`

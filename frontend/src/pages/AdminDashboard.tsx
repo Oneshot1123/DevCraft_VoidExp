@@ -24,6 +24,7 @@ import {
 import { motion } from "framer-motion";
 import { CategoryPieChart, ResolutionTrendChart } from '@/components/DashboardCharts';
 import GeospatialHeatmap from '@/components/Heatmap';
+import { API_BASE_URL, WS_BASE_URL } from '../config';
 
 interface Complaint {
     id: string;
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchComplaints();
         // Setup WebSocket connection for real-time updates
-        const socket = new WebSocket('ws://localhost:8000/ws/admin');
+        const socket = new WebSocket(`${WS_BASE_URL}/ws/admin`);
         socket.onmessage = (event) => {
             const update = JSON.parse(event.data);
             if (update.type === 'NEW_COMPLAINT') {
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
 
     const fetchComplaints = async () => {
         try {
-            const response = await fetch("http://localhost:8000/complaints/", {
+            const response = await fetch(`${API_BASE_URL}/complaints/`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -118,7 +119,7 @@ export default function AdminDashboard() {
                 if (!resolution_note) return;
             }
 
-            const res = await fetch(`http://localhost:8000/complaints/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/complaints/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

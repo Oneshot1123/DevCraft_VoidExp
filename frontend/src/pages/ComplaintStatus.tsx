@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, Activity, Shield, CheckCircle2, Clock, AlertCircle, MapPin, Search, ArrowRight, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_BASE_URL } from '../config';
 
 interface Complaint {
     id: string;
@@ -31,7 +32,7 @@ export default function ComplaintStatus() {
 
     const fetchComplaints = async () => {
         try {
-            const response = await fetch("http://localhost:8000/complaints/", {
+            const response = await fetch(`${API_BASE_URL}/complaints/`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
