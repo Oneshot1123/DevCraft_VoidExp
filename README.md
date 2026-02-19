@@ -77,11 +77,22 @@ Citizens submit complaints via text, voice, or image. Our AI Neural Suite instan
 
 ## 📸 Visual Walkthrough
 
-![CivicSense Dashboard](file:///C:/Users/ADMIN/.gemini/antigravity/brain/029c9fe1-9048-4ee6-8cf8-051acb4217db/civicsense_dashboard_preview.png)
-*Figure 1: Executive Dashboard with Live Heatmap and AI Triage Feed.*
+### 1. Citizen Experience
+![Landing Page](docs/screenshots/landing_page.png)
+*Figure 1: High-fidelity municipal landing page with role-aware portals.*
 
-![Complaint Submission](file:///C:/Users/ADMIN/.gemini/antigravity/brain/029c9fe1-9048-4ee6-8cf8-051acb4217db/complaint_submission_flow.png)
-*Figure 2: Multi-step submission with map integration and AI analysis.*
+![Complaint Submission](docs/screenshots/complaint_form.png)
+*Figure 2: AI-driven reporting flow with geospatial map integration.*
+
+![Citizen Tracking](docs/screenshots/status_tracker.png)
+*Figure 3: Personal tracking hub with real-time AI triage status.*
+
+### 2. Administrator Executive Suite
+![Admin Dashboard](docs/screenshots/admin_dashboard.png)
+*Figure 4: Executive Command Center with Live Heatmap and Triage Feed.*
+
+![Resolution Accountability](docs/screenshots/resolution_dialog.png)
+*Figure 5: Verifiable resolution proof system for municipal transparency.*
 
 ---
 
