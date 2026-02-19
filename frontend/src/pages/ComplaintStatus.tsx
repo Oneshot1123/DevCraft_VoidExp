@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Activity, Shield, CheckCircle2, Clock, AlertCircle, MapPin, Search, ArrowRight, XCircle } from "lucide-react";
+import { Loader2, Activity, Shield, CheckCircle2, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_BASE_URL } from '../config';
 
