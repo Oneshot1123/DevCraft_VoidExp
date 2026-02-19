@@ -41,36 +41,36 @@ function Login({ onLogin, onBack }: { onLogin: (token: string, role: string, dep
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30">
+    <div className="flex items-center justify-center min-h-screen bg-background text-foreground neural-noise selection:bg-primary/20">
       <div className="fixed inset-0 z-0 mesh-gradient opacity-60 pointer-events-none" />
       <Button
         variant="ghost"
-        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-zinc-500 hover:text-white"
+        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-primary hover:text-primary/70"
         onClick={onBack}
       >
         ← Return to Origin
       </Button>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
-        <Card className="glass-card border-none rounded-[3rem] overflow-hidden shadow-2xl">
-          <CardHeader className="space-y-4 py-16 border-b border-white/5 bg-gradient-to-b from-blue-600/10 items-center">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-2 shadow-2xl shadow-blue-500/20 rotate-12">
-              <Zap className="w-8 h-8 text-white" />
+        <Card className="glass-card border-none rounded-3xl overflow-hidden shadow-xl bg-card">
+          <CardHeader className="space-y-4 py-12 border-b border-border bg-primary items-center">
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-2 shadow-lg rotate-12">
+              <Zap className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-4xl font-black tracking-tighter text-gradient uppercase italic">Initialize</CardTitle>
-            <p className="text-center text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Authorized Access Only</p>
+            <CardTitle className="text-4xl font-black tracking-tighter text-white uppercase italic">Initialize</CardTitle>
+            <p className="text-center text-[10px] font-black text-blue-100/60 uppercase tracking-[0.3em]">Authorized Access Only</p>
           </CardHeader>
           <CardContent className="p-10 pt-12 space-y-8">
             <form onSubmit={handleLogin} className="space-y-8">
               <div className="space-y-3">
-                <Label htmlFor="login-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Registry Email</Label>
-                <Input id="login-email" data-testid="login-email" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={email} onChange={e => setEmail(e.target.value)} placeholder="officer@civic.gov" type="email" required />
+                <Label htmlFor="login-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary pl-1">Registry Email</Label>
+                <Input id="login-email" data-testid="login-email" className="h-16 rounded-2xl border-border bg-muted focus:ring-2 focus:ring-primary text-sm font-bold tracking-tight" value={email} onChange={e => setEmail(e.target.value)} placeholder="officer@civic.gov" type="email" required />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="login-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Security Key</Label>
-                <Input id="login-password" data-testid="login-password" type="password" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={password} onChange={e => setPassword(e.target.value)} required />
+                <Label htmlFor="login-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary pl-1">Security Key</Label>
+                <Input id="login-password" data-testid="login-password" type="password" className="h-16 rounded-2xl border-border bg-muted focus:ring-2 focus:ring-primary text-sm font-bold tracking-tight" value={password} onChange={e => setPassword(e.target.value)} required />
               </div>
-              {err && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center italic">{err}</p>}
-              <Button id="login-submit" data-testid="login-submit" type="submit" className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-white text-black hover:bg-zinc-200 shadow-xl shadow-white/5 transition-all">
+              {err && <p className="text-[10px] text-destructive font-bold uppercase tracking-widest text-center italic">{err}</p>}
+              <Button id="login-submit" data-testid="login-submit" type="submit" className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-primary text-white hover:bg-primary/90 shadow-lg transition-all">
                 Initialize Session
               </Button>
             </form>
@@ -111,39 +111,39 @@ function Register({ onRegister, onBack }: { onRegister: () => void, onBack: () =
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30">
+    <div className="flex items-center justify-center min-h-screen bg-background text-foreground neural-noise selection:bg-primary/20">
       <div className="fixed inset-0 z-0 mesh-gradient opacity-60 pointer-events-none" />
       <Button
         variant="ghost"
-        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-zinc-500 hover:text-white"
+        className="fixed top-8 left-8 text-[9px] font-black uppercase tracking-[0.4em] z-20 text-primary hover:text-primary/70"
         onClick={onBack}
       >
         ← Return
       </Button>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
-        <Card className="glass-card border-none rounded-[3rem] overflow-hidden shadow-2xl">
-          <CardHeader className="space-y-4 py-16 border-b border-white/5 bg-gradient-to-b from-blue-600/10 items-center">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-2 shadow-2xl shadow-blue-500/20 -rotate-6">
-              <Zap className="w-8 h-8 text-white" />
+        <Card className="glass-card border-none rounded-3xl overflow-hidden shadow-xl bg-card">
+          <CardHeader className="space-y-4 py-12 border-b border-border bg-primary items-center">
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-2 shadow-lg -rotate-6">
+              <Zap className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-4xl font-black tracking-tighter text-gradient uppercase italic">Registry</CardTitle>
-            <p className="text-center text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">New Citizen Enrollment</p>
+            <CardTitle className="text-4xl font-black tracking-tighter text-white uppercase italic">Registry</CardTitle>
+            <p className="text-center text-[10px] font-black text-blue-100/60 uppercase tracking-[0.3em]">New Citizen Enrollment</p>
           </CardHeader>
           <CardContent className="p-10 pt-12 space-y-8">
             <form onSubmit={handleRegister} className="space-y-8">
               <div className="space-y-3">
-                <Label htmlFor="reg-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Email Identity</Label>
-                <Input id="reg-email" data-testid="reg-email" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={email} onChange={e => setEmail(e.target.value)} placeholder="citizen@civic.net" type="email" required />
+                <Label htmlFor="reg-email" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary pl-1">Email Identity</Label>
+                <Input id="reg-email" data-testid="reg-email" className="h-16 rounded-2xl border-border bg-muted focus:ring-2 focus:ring-primary text-sm font-bold tracking-tight" value={email} onChange={e => setEmail(e.target.value)} placeholder="citizen@civic.net" type="email" required />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="reg-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 pl-1">Access Passcode</Label>
-                <Input id="reg-password" data-testid="reg-password" type="password" className="h-16 rounded-2xl border-none bg-zinc-900/50 focus:ring-2 focus:ring-blue-600 text-sm font-bold tracking-tight text-white" value={password} onChange={e => setPassword(e.target.value)} required />
+                <Label htmlFor="reg-password" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary pl-1">Access Passcode</Label>
+                <Input id="reg-password" data-testid="reg-password" type="password" className="h-16 rounded-2xl border-border bg-muted focus:ring-2 focus:ring-primary text-sm font-bold tracking-tight" value={password} onChange={e => setPassword(e.target.value)} required />
               </div>
-              {err && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center italic">{err}</p>}
-              <Button id="reg-submit" data-testid="reg-submit" type="submit" disabled={loading} className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-white text-black hover:bg-zinc-200 shadow-xl shadow-white/5 transition-all">
+              {err && <p className="text-[10px] text-destructive font-bold uppercase tracking-widest text-center italic">{err}</p>}
+              <Button id="reg-submit" data-testid="reg-submit" type="submit" disabled={loading} className="w-full h-16 text-xs font-black uppercase tracking-[0.3em] rounded-2xl bg-primary text-white hover:bg-primary/90 shadow-lg transition-all">
                 {loading ? "INITIALIZING..." : "Enact Registry"}
               </Button>
-              <button type="button" onClick={onBack} className="w-full text-[9px] font-black text-zinc-600 hover:text-white uppercase tracking-widest text-center">
+              <button type="button" onClick={onBack} className="w-full text-[9px] font-black text-primary hover:text-primary/70 uppercase tracking-widest text-center">
                 Already Enlisted? Return to Origin
               </button>
             </form>
@@ -202,47 +202,47 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white selection:bg-blue-500/30 neural-noise overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 neural-noise overflow-hidden">
       <div className="fixed inset-0 z-0 mesh-gradient opacity-30 pointer-events-none" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 h-24 glass border-none">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 h-24 bg-primary text-white border-b border-primary/20">
         <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 rotate-12">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-lg rotate-12">
+              <Zap className="w-5 h-5 text-primary" />
             </div>
             <span className="text-xl font-black tracking-tighter uppercase italic translate-y-[1px]">CivicSense</span>
           </Link>
           <div className="hidden md:flex gap-10">
             {role === 'citizen' ? (
               <>
-                <Link to="/report" className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-white transition-colors">Dispatch Report</Link>
-                <Link to="/status" className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-white transition-colors">Sector Pulse</Link>
+                <Link to="/report" className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-100 hover:text-white transition-colors">Dispatch Report</Link>
+                <Link to="/status" className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-100 hover:text-white transition-colors">Sector Pulse</Link>
               </>
             ) : (
-              <Link to="/admin" className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 underline decoration-2 underline-offset-8">Executive Oversight</Link>
+              <Link to="/admin" className="text-[10px] font-black uppercase tracking-[0.3em] text-white underline decoration-2 underline-offset-8">Executive Oversight</Link>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-8">
-          <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/5 gap-1.5 backdrop-blur-md">
+          <div className="flex bg-white/10 p-1.5 rounded-xl border border-white/10 gap-1.5 backdrop-blur-md">
             {(['en', 'hi', 'mr'] as Language[]).map(l => (
               <button
                 key={l}
                 onClick={() => setLanguage(l)}
-                className={`px-3 py-1 text-[8px] font-black rounded-lg transition-all ${language === l ? 'bg-white text-black shadow-lg' : 'text-zinc-600 hover:text-zinc-300'}`}
+                className={`px-3 py-1 text-[8px] font-black rounded-lg transition-all ${language === l ? 'bg-white text-primary shadow-lg' : 'text-blue-200 hover:text-white'}`}
               >
                 {l.toUpperCase()}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-4 pl-4 border-l border-white/5">
-            <Badge variant="outline" className="h-10 px-4 rounded-xl font-black text-[9px] uppercase tracking-widest border-white/10 text-zinc-500 flex gap-2">
-              <User className="w-3 h-3 text-blue-500" /> {role.replace('_', ' ')}
+          <div className="flex items-center gap-4 pl-4 border-l border-white/10">
+            <Badge variant="outline" className="h-10 px-4 rounded-xl font-black text-[9px] uppercase tracking-widest border-white/20 text-white flex gap-2">
+              <User className="w-3 h-3 text-blue-200" /> {role.replace('_', ' ')}
             </Badge>
-            <button onClick={handleLogout} className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center hover:bg-zinc-800 transition-all text-zinc-500 hover:text-white">
+            <button onClick={handleLogout} className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white">
               <LogOut className="w-4 h-4" />
             </button>
           </div>

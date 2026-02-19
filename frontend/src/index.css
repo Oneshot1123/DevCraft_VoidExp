@@ -28,79 +28,60 @@
 
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  
+  --color-warning: #F59E0B;
+  --color-success: #2E7D32;
+  --color-info: #2563EB;
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-lg: 1rem;
+  --radius-md: calc(var(--radius-lg) - 2px);
+  --radius-sm: calc(var(--radius-lg) - 4px);
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --radius: 1.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 215 51% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 90%;
+    --secondary-foreground: 215 51% 25%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 215 51% 25%;
+    --destructive: 0 66% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 215 51% 25%;
+    --radius: 1rem;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl border border-white/20 dark:border-white/5;
+    @apply bg-white/80 backdrop-blur-md border border-slate-200/50;
   }
 
   .glass-card {
-    @apply bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-2xl;
+    @apply bg-white border border-slate-200 shadow-sm;
   }
 
   .text-gradient {
-    @apply bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent;
   }
 
   .mesh-gradient {
-    background-color: hsla(240, 10%, 3.9%, 1);
+    background-color: #F8FAFC;
     background-image:
-      radial-gradient(at 0% 0%, hsla(221, 83%, 53%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(262, 83%, 58%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(221, 83%, 53%, 0.1) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(262, 83%, 58%, 0.1) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(215, 51%, 25%, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(215, 51%, 25%, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(215, 51%, 25%, 0.02) 0px, transparent 50%);
   }
 
   .neural-noise {
@@ -112,9 +93,9 @@
     position: absolute;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
+    opacity: 0.015;
     pointer-events: none;
-    mix-blend-mode: soft-light;
+    mix-blend-mode: multiply;
   }
 
   .bento-grid {

@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS complaints (
     duplicate_group_id UUID,
     sla_eta TEXT,           -- Duration like '2 Hours'
     duplicate_count INTEGER DEFAULT 0,
-    user_id UUID REFERENCES users(id)
+    user_id UUID REFERENCES users(id),
+    resolution_note TEXT,
+    resolution_image_url TEXT
 );
 
 -- Indexes for performance

@@ -1,0 +1,12 @@
+{
+  "status": "init",
+  "executionArgs": {
+    "projectName": "DevCraft",
+    "projectPath": "c:\\Users\\ADMIN\\Desktop\\DevCraft",
+    "testIds": [],
+    "additionalInstruction": "Verify that complaints can still be submitted and viewed on the dashboard after the UI color refactor. Ensure no functional regressions were introduced by the style changes.",
+    "envs": {
+      "API_KEY": "sk-user-6k0nBdqgBBcxAE3727UQoLoBH2JbET6pluXnsDy1WAgREfMkd0lMCtLdLYnFFPr4LQ_tKuoabBJTcVKP70Xbfqi2sNY_aeIbJ_S0m4I-lXER7fuUZbLgiMdG3XZfsaAgq7s"
+    }
+  }
+}

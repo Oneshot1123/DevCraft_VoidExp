@@ -30,6 +30,8 @@ class ComplaintUpdate(BaseModel):
     department: Optional[str] = None
     urgency: Optional[str] = None
     rejection_reason: Optional[str] = None
+    resolution_note: Optional[str] = None
+    resolution_image_url: Optional[str] = None
 
 # Schema for reading a complaint (output)
 class ComplaintRead(ComplaintBase):
@@ -47,6 +49,8 @@ class ComplaintRead(ComplaintBase):
     sla_eta: Optional[str] = None
     duplicate_count: Optional[int] = 0
     rejection_reason: Optional[str] = None
+    resolution_note: Optional[str] = None
+    resolution_image_url: Optional[str] = None
 
     @computed_field
     @property

@@ -117,26 +117,26 @@ export default function ComplaintForm() {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white neural-noise selection:bg-blue-500/30 py-20 px-6">
-            <div className="fixed inset-0 z-0 mesh-gradient opacity-40 pointer-events-none" />
+        <div className="min-h-screen bg-background text-foreground neural-noise selection:bg-primary/20 py-20 px-6">
+            <div className="fixed inset-0 z-0 mesh-gradient opacity-60 pointer-events-none" />
 
             <div className="relative z-10 max-w-5xl mx-auto">
                 <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="h-12 w-3 bg-blue-600 rounded-full shadow-lg shadow-blue-500/20" />
-                            <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-gradient uppercase">
+                            <div className="h-12 w-3 bg-primary rounded-full shadow-lg shadow-primary/20" />
+                            <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-primary uppercase">
                                 Dispatch Report
                             </h1>
                         </div>
-                        <p className="text-xl text-zinc-500 dark:text-zinc-400 pl-7 max-w-xl font-medium leading-relaxed">
-                            Neural-optimized reporting flow. Step {step} of 3.
+                        <p className="text-xl text-muted-foreground pl-7 max-w-xl font-medium leading-relaxed">
+                            Official reporting protocol. Step {step} of 3.
                         </p>
                     </div>
                     {step < 4 && (
                         <div className="flex gap-2">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= i ? 'bg-blue-600' : 'bg-zinc-800'}`} />
+                                <div key={i} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary' : 'bg-muted'}`} />
                             ))}
                         </div>
                     )}
@@ -149,17 +149,17 @@ export default function ComplaintForm() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="glass-card rounded-[3rem] p-12 space-y-8"
+                            className="glass-card rounded-[3rem] p-12 space-y-8 bg-white border border-border shadow-sm"
                         >
                             <div className="space-y-4">
-                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Subject Metadata</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Subject Metadata</label>
                                 <textarea
                                     id="complaint-text"
                                     data-testid="complaint-text"
                                     value={text}
                                     onChange={(e) => setText(e.target.value)}
                                     placeholder="Describe the institutional issue in detail..."
-                                    className="w-full h-64 bg-zinc-900/50 border-none rounded-3xl p-8 text-2xl font-black tracking-tight focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-zinc-700"
+                                    className="w-full h-64 bg-muted border border-border rounded-3xl p-8 text-2xl font-black tracking-tight focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground/50 text-foreground"
                                 />
                             </div>
                             <div className="flex justify-end">
@@ -168,7 +168,7 @@ export default function ComplaintForm() {
                                     data-testid="step1-next"
                                     disabled={!text}
                                     onClick={() => setStep(2)}
-                                    className="px-10 py-5 rounded-2xl bg-white text-black text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-white/5"
+                                    className="px-10 py-5 rounded-2xl bg-primary text-white text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-primary/20"
                                 >
                                     Next Phase <ArrowRight className="w-4 h-4" />
                                 </button>
@@ -182,39 +182,39 @@ export default function ComplaintForm() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="glass-card rounded-[3rem] p-12 space-y-8 h-[700px] flex flex-col"
+                            className="glass-card rounded-[3rem] p-12 space-y-8 h-[700px] flex flex-col bg-white border border-border shadow-sm"
                         >
-                            <div className="flex-1 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-inner bg-zinc-900 relative">
-                                <MapContainer center={[19.076, 72.8777]} zoom={12} className="h-full w-full grayscale contrast-125 invert opacity-80">
+                            <div className="flex-1 rounded-[2.5rem] overflow-hidden border border-border shadow-inner bg-muted relative">
+                                <MapContainer center={[19.076, 72.8777]} zoom={12} className="h-full w-full opacity-90">
                                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                     <LocationMarker />
                                 </MapContainer>
-                                <div className="absolute top-8 left-8 z-[1000] glass-card px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                    <Globe className="w-3 h-3 text-blue-500" /> Neural Mapping Active
+                                <div className="absolute top-8 left-8 z-[1000] glass-card bg-white/80 border border-border px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                    <Globe className="w-3 h-3 text-primary" /> Mapping Active
                                 </div>
                                 <div className="absolute bottom-8 left-8 right-8 z-[1000] space-y-4">
-                                    <div className="glass shadow-2xl p-6 rounded-3xl flex items-center gap-6">
-                                        <div className="p-4 rounded-2xl bg-blue-600/10 text-blue-500">
+                                    <div className="glass shadow-2xl p-6 rounded-3xl flex items-center gap-6 bg-white/90 border border-border">
+                                        <div className="p-4 rounded-2xl bg-primary/10 text-primary">
                                             <Search className="w-6 h-6" />
                                         </div>
                                         <input
                                             value={address}
                                             onChange={(e) => setAddress(e.target.value)}
                                             placeholder="Fallback: Enter Manual Identity/Address..."
-                                            className="bg-transparent border-none focus:ring-0 text-sm font-bold tracking-tight text-white flex-1"
+                                            className="bg-transparent border-none focus:ring-0 text-sm font-bold tracking-tight text-foreground flex-1"
                                         />
                                     </div>
-                                    <p className="text-center text-[8px] font-black text-zinc-600 uppercase tracking-widest">Dragging Enabled for Precision Calibration</p>
+                                    <p className="text-center text-[8px] font-black text-muted-foreground uppercase tracking-widest bg-white/50 py-1 rounded-full backdrop-blur-sm">Dragging Enabled for Precision Calibration</p>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center">
-                                <button onClick={() => setStep(1)} className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors flex items-center gap-2">
+                                <button onClick={() => setStep(1)} className="text-sm font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
                                     <ArrowLeft className="w-4 h-4" /> Back
                                 </button>
                                 <button
                                     disabled={!location}
                                     onClick={() => setStep(3)}
-                                    className="px-10 py-5 rounded-2xl bg-white text-black text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-white/5"
+                                    className="px-10 py-5 rounded-2xl bg-primary text-white text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 flex items-center gap-3 shadow-xl shadow-primary/20"
                                 >
                                     Geocode Location <ArrowRight className="w-4 h-4" />
                                 </button>
@@ -228,21 +228,21 @@ export default function ComplaintForm() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="glass-card rounded-[3rem] p-12 space-y-12"
+                            className="glass-card rounded-[3rem] p-12 space-y-12 bg-white border border-border shadow-sm"
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                 <div className="space-y-6">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Visual Evidence (Optional)</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Visual Evidence (Optional)</label>
                                     <div
                                         onClick={() => document.getElementById('image-upload')?.click()}
-                                        className="h-80 w-full rounded-[2.5rem] bg-zinc-900/50 border-2 border-dashed border-zinc-800 hover:border-blue-600/50 transition-all flex flex-col items-center justify-center gap-4 cursor-pointer relative overflow-hidden group"
+                                        className="h-80 w-full rounded-[2.5rem] bg-muted border-2 border-dashed border-border hover:border-primary/50 transition-all flex flex-col items-center justify-center gap-4 cursor-pointer relative overflow-hidden group"
                                     >
                                         {imagePreview ? (
-                                            <img src={imagePreview} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" />
+                                            <img src={imagePreview} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                         ) : (
                                             <>
-                                                <Camera className="w-12 h-12 text-zinc-700 group-hover:text-blue-500 transition-colors" />
-                                                <span className="text-xs font-black uppercase tracking-widest text-zinc-600">Deploy Image Probe</span>
+                                                <Camera className="w-12 h-12 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                                                <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Deploy Image Probe</span>
                                             </>
                                         )}
                                         <input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
@@ -251,7 +251,7 @@ export default function ComplaintForm() {
                                     {/* Voice Input Probe */}
                                     <button
                                         onClick={() => setIsRecording(!isRecording)}
-                                        className={`w-full py-6 rounded-2xl flex items-center justify-center gap-4 border border-white/5 transition-all ${isRecording ? 'bg-red-500/20 text-red-500 animate-pulse border-red-500/30' : 'bg-zinc-900/50 text-zinc-600 hover:text-white hover:bg-zinc-800'}`}
+                                        className={`w-full py-6 rounded-2xl flex items-center justify-center gap-4 border transition-all ${isRecording ? 'bg-destructive/10 text-destructive animate-pulse border-destructive/30' : 'bg-muted text-muted-foreground hover:text-primary hover:bg-muted/80 border-border'}`}
                                     >
                                         <Mic className="w-5 h-5" />
                                         <span className="text-[10px] font-black uppercase tracking-[0.2em]">
@@ -260,18 +260,18 @@ export default function ComplaintForm() {
                                     </button>
                                 </div>
                                 <div className="space-y-8 flex flex-col justify-center">
-                                    <div className="glass shadow-none p-8 rounded-3xl space-y-4">
-                                        <h4 className="flex items-center gap-2 text-blue-400 text-xs font-black uppercase tracking-widest">
+                                    <div className="p-8 rounded-3xl space-y-4 bg-muted border border-border">
+                                        <h4 className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest">
                                             <Shield className="w-4 h-4" /> Verification Protocol
                                         </h4>
-                                        <p className="text-sm text-zinc-500 font-medium">By initializing this report, you confirm the municipal accuracy of the provided metadata.</p>
+                                        <p className="text-sm text-muted-foreground font-medium">By initializing this report, you confirm the municipal accuracy of the provided metadata.</p>
                                     </div>
                                     <button
                                         id="complaint-submit"
                                         data-testid="complaint-submit"
                                         onClick={handleSubmit}
                                         disabled={loading}
-                                        className="w-full h-24 rounded-3xl bg-blue-600 text-white text-lg font-black uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 group"
+                                        className="w-full h-24 rounded-3xl bg-primary text-white text-lg font-black uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 group"
                                     >
                                         {loading ? <Loader2 className="w-8 h-8 animate-spin" /> : (
                                             <>Commit Report <Zap className="w-6 h-6 group-hover:scale-125 transition-transform" /></>
@@ -287,36 +287,36 @@ export default function ComplaintForm() {
                             key="step4"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="glass-card rounded-[3rem] p-16 text-center space-y-12"
+                            className="glass-card rounded-[3rem] p-16 text-center space-y-12 bg-white border border-border shadow-sm"
                         >
-                            <div className="w-24 h-24 rounded-full bg-emerald-500/20 text-emerald-500 mx-auto flex items-center justify-center animate-bounce shadow-2xl shadow-emerald-500/10">
+                            <div className="w-24 h-24 rounded-full bg-success/10 text-success mx-auto flex items-center justify-center animate-bounce shadow-2xl shadow-success/10">
                                 <CheckCircle2 className="w-12 h-12" />
                             </div>
                             <div className="space-y-4">
-                                <h2 className="text-6xl font-black uppercase tracking-tighter text-gradient">Report Anchored</h2>
-                                <p className="text-xl text-zinc-400 font-medium">Your civic contribution has been TRIAGED and ROUTED.</p>
+                                <h2 className="text-6xl font-black uppercase tracking-tighter text-primary">Report Anchored</h2>
+                                <p className="text-xl text-muted-foreground font-medium">Your civic contribution has been TRIAGED and ROUTED.</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                                <div className="glass-card p-8 rounded-3xl space-y-2 border-white/5 bg-white/5">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Tracking ID</span>
-                                    <p className="text-xl font-black uppercase text-blue-500">{result.id.slice(0, 8)}</p>
+                                <div className="p-8 rounded-3xl space-y-2 border border-border bg-muted">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tracking ID</span>
+                                    <p className="text-xl font-black uppercase text-primary">{result.id.slice(0, 8)}</p>
                                 </div>
-                                <div className="glass-card p-8 rounded-3xl space-y-2 border-white/5 bg-white/5">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Sector</span>
-                                    <p className="text-xl font-black uppercase">{result.ward || "Ward A"}</p>
+                                <div className="p-8 rounded-3xl space-y-2 border border-border bg-muted">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sector</span>
+                                    <p className="text-xl font-black uppercase text-foreground">{result.ward || "Ward A"}</p>
                                 </div>
-                                <div className="glass-card p-8 rounded-3xl space-y-2 border-blue-500/20 bg-blue-500/5">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">Neural Triage</span>
-                                    <p className="text-xl font-black uppercase text-blue-400">{result.category || result.classification}</p>
+                                <div className="p-8 rounded-3xl space-y-2 border border-primary/20 bg-primary/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Neural Triage</span>
+                                    <p className="text-xl font-black uppercase text-primary">{result.category || result.classification}</p>
                                 </div>
-                                <div className="glass-card p-8 rounded-3xl space-y-2 border-emerald-500/20 bg-emerald-500/5">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Response SLA</span>
-                                    <p className="text-xl font-black uppercase text-emerald-400">{result.sla_eta || "24 Hours"}</p>
+                                <div className="p-8 rounded-3xl space-y-2 border border-success/20 bg-success/5">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-success">Response SLA</span>
+                                    <p className="text-xl font-black uppercase text-success">{result.sla_eta || "24 Hours"}</p>
                                 </div>
                             </div>
 
-                            <button onClick={() => navigate('/status')} className="px-12 py-6 rounded-2xl bg-zinc-900 text-white text-sm font-black uppercase tracking-widest hover:scale-105 transition-all">
+                            <button onClick={() => navigate('/status')} className="px-12 py-6 rounded-2xl bg-primary text-white text-sm font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
                                 Track Live Pulse
                             </button>
                         </motion.div>
